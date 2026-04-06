@@ -44,7 +44,7 @@ handmade_products[ icon: tag]{
   material text
 
 }
-available_stocks[icon: layers]{
+inventory[icon: layers]{
   id serial pk
   product_id int fk
 
