@@ -1,0 +1,117 @@
+title Instagram Thrift Creator Store ER Diagram
+colorMode pastel 
+notation chen
+styleMode plain
+typeface clean
+
+// availableStock, customer,products,  orders, order_items,  payment, shipping
+
+customer[icon: user]{
+  id serial pk,
+  name text
+  email text unique not null
+  phone_no text unique not null
+  address text
+
+  created_at timestamp
+  updated_at timestamp
+}
+
+product[icon: box]{
+  id serial pk
+  name text not null
+  description text
+  price int
+
+  created_at timestamp
+  updated_at timestamp
+
+}
+
+thrift_products[ icon: tag]{
+  id serial pk
+  product_id int fk unique
+
+  condition text //used // almost new\
+  size text
+  color text
+  
+}
+handmade_products[ icon: tag]{
+  id serial pk
+  product_id int fk unique
+
+  batch_size int 
+  material text
+
+}
+available_stocks[icon: layers]{
+  id serial pk
+  product_id int fk
+
+  quantity int
+  updated_at timestamp
+}
+
+orders[icon: shopping-bag]{
+  id serial pk
+  customer_id int fk
+
+  order_date timestamp
+  total_amount int 
+  status int
+
+  created_at timestamp
+  updated_at timestamp
+}
+order_items[icon: list]{
+  id serial pk
+  order_id int fk
+  product_id int fk
+
+  count int
+  price int 
+}
+
+payment[icon: money]{
+  id serial pk
+  order_id int fk
+
+  amount int not null
+  status int not null
+  method_of_payment int
+}
+
+shipping[icon: truck]{
+  id serial pk
+  order_id int fk
+
+  address text not null
+  city text not null
+  state text not null
+  pincode int check (length(pincode) = 6)
+}
+
+//A customer can place multiple orders
+customer.id < orders.customer_id
+
+//One order can contain multiple products.
+orders.id < order_items.order_id
+
+//1 product can be part of multiple order_items
+product.id< order_items.product_id
+
+
+product.id - thrift_products.product_id
+product.id - handmade_products.product_id
+
+//1 order- 1 payment
+orders.id - payment.order_id
+
+// 1 order - 1 shipping
+orders.id - shipping.order_id
+
+// 1 product - 1 stock
+available_stocks.product_id  - product.id
+
+
