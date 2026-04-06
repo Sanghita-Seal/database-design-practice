@@ -2,8 +2,7 @@ title Instagram Thrift Creator Store ER Diagram
 colorMode pastel 
 notation chen
 styleMode plain
-typeface clean
-
+typeface clean 
 // availableStock, customer,products,  orders, order_items,  payment, shipping
 
 customer[icon: user]{
@@ -59,7 +58,7 @@ orders[icon: shopping-bag]{
 
   order_date timestamp
   total_amount int 
-  status int
+  status text
 
   created_at timestamp
   updated_at timestamp
@@ -69,7 +68,7 @@ order_items[icon: list]{
   order_id int fk
   product_id int fk
 
-  count int
+  quantity int
   price int 
 }
 
@@ -78,8 +77,8 @@ payment[icon: money]{
   order_id int fk
 
   amount int not null
-  status int not null
-  method_of_payment int
+  status text not null
+  method_of_payment text
 }
 
 shipping[icon: truck]{
@@ -89,7 +88,7 @@ shipping[icon: truck]{
   address text not null
   city text not null
   state text not null
-  pincode int check (length(pincode) = 6)
+  pincode int not null
 }
 
 //A customer can place multiple orders
