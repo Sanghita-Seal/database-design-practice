@@ -1,0 +1,209 @@
+title Fitness Influencer Coaching Platform DB Design
+users[icon: user, color: blue]{
+  user_id: int pk
+  name string not null
+  email unique string not null
+  phone string not null
+  password_hashed string
+  role enum('trainer', 'client', 'admin')
+
+  instagram_handle string
+  gender string
+  dob date
+
+  created_at datetime
+  is_active boolean
+}
+
+clients[icon: activity, color: purple]{
+  client_id serial int pk
+  user_id int fk
+  height decimal
+  weight decimal
+  medical_conditions text
+  fitness_goal string
+  lifestyle_notes text
+  state string
+  country string
+}
+
+trainers[icon: award, color: orange]{
+  trainer_id int pk
+  user_id int fk
+  bio text
+  experience_years int
+  specialization string
+  certification string
+  pricing_note text
+}
+
+plans[icon: clipboard, color: yellow]{
+  plan_id serial int pk
+  created_by int fk
+
+  title string
+  description text
+  plan_type string
+  duration_days int 
+  price decimal
+
+  is_active boolean
+  created_at datetime
+}
+
+workout_plans[icon: dumbbell, color: red]{
+  workout_id int pk
+  plan_id int fk
+
+  title string
+  description text
+}
+
+diet_plans[icon: apple, color: green]{
+  diet_id int pk
+  plan_id int fk
+
+  title string
+  description text
+}
+
+subscriptions [icon: repeat, color: teal]{
+  subscription_id serial int pk
+  client_id int fk
+  plan_id int fk
+  trainer_id int fk
+
+  start_date datetime
+  end_date datetime
+  status enum('active', 'expired', 'cancelled')
+  auto_renew boolean
+
+  created_at datetime
+  updated_at datetime
+}
+
+sessions[icon: video, color: cyan]{
+  session_id int pk
+  trainer_id int fk
+  client_id int fk
+  subscription_id int fk
+
+  session_type enum('consultation', 'longterm coaching', 'live workout', 'diet & workout plan')
+  scheduled_at datetime
+  duration_minutes int
+  instagram_handle string
+  meeting_link string
+  session_status enum(scheduled, completed, missed)
+  notes text
+
+  created_at datetime
+  updated_at datetime
+}
+
+payments[icon: credit-card, color: green]{
+  payment_id int pk
+  subscription_id int fk
+
+  amount decimal
+  currency string
+  payment_method enum(upi, card)
+  session_status enum('scheduled', 'completed', 'missed')
+  transaction_id string not null
+
+  paid_at datetime
+}
+
+check_ins[icon: check-square, color: indigo]{
+  checkin_id int pk
+  subscription_id int fk
+  client_id int fk
+
+  week_number int
+  submitted_at datetime
+  day_number int
+
+  weight decimal not null
+  energy_level string
+
+  notes text
+}
+
+progress_log[icon: trending-up, color: lime]{
+  progress_id int pk
+  client_id int fk
+  checkin_id int fk
+
+  weight decimal
+  body_fat_percentage decimal
+  chest_cm decimal
+  waist_cm decimal
+  arms_cm decimal
+
+  progress_date datetime
+}
+
+trainer_note[icon: file-text, color: gray]{
+  note_id int pk
+  trainer_id int fk
+  checkin_id int fk
+
+  feedback text
+  diet_adjustment text
+  workout_adjustment text
+
+  created_at datetime
+}
+
+success_story[icon: star, color: gold]{
+  story_id int pk
+  client_id int fk
+  trainer_id int fk
+  subscription_id int fk
+
+  title string
+  description text
+
+  before_weight decimal
+  after_weight decimal
+  transformation_days int
+
+  before_image_url string
+  after_image_url string
+
+  rating int // between 1 to 5
+  is_approved boolean // trainer/ admin approval before publishing
+
+  created_at datetime
+  updated_at datetime
+}
+
+users.user_id < clients.user_id
+users.user_id < trainers.user_id
+
+trainers.trainer_id < plans.created_by
+
+plans.plan_id < workout_plans.plan_id
+plans.plan_id < diet_plans.plan_id
+
+clients.client_id < subscriptions.client_id
+plans.plan_id < subscriptions.plan_id
+trainers.trainer_id < subscriptions.trainer_id
+
+subscriptions.subscription_id < payments.subscription_id
+
+trainers.trainer_id < sessions.trainer_id
+clients.client_id < sessions.client_id
+subscriptions.subscription_id < sessions.subscription_id
+
+clients.client_id < check_ins.client_id
+subscriptions.subscription_id < check_ins.subscription_id
+
+check_ins.checkin_id < progress_log.checkin_id
+clients.client_id < progress_log.client_id
+
+check_ins.checkin_id < trainer_note.checkin_id
+trainers.trainer_id < trainer_note.trainer_id
+
+clients.client_id < success_story.client_id
+trainers.trainer_id < success_story.trainer_id
+subscriptions.subscription_id < success_story.subscription_id
