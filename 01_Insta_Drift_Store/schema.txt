@@ -1,8 +1,10 @@
+// =======================
 title Instagram Thrift Creator Store ER Diagram
-colorMode pastel 
+colorMode bold 
 notation chen
 styleMode plain
 typeface clean 
+
 // availableStock, customer,products,  orders, order_items,  payment, shipping
 
 customer[icon: user]{
@@ -16,7 +18,7 @@ customer[icon: user]{
   updated_at timestamp
 }
 
-product[icon: box]{
+product[icon: box, color: Black]{
   id serial pk
   name text not null
   description text
@@ -24,26 +26,25 @@ product[icon: box]{
 
   created_at timestamp
   updated_at timestamp
-
 }
 
 thrift_products[ icon: tag]{
   id serial pk
   product_id int fk unique
 
-  condition text //used // almost new\
+  condition enum('used','like_new','new')
   size text
   color text
-  
 }
+
 handmade_products[ icon: tag]{
   id serial pk
   product_id int fk unique
 
   batch_size int 
   material text
-
 }
+
 inventory[icon: layers]{
   id serial pk
   product_id int fk
@@ -58,11 +59,12 @@ orders[icon: shopping-bag]{
 
   order_date timestamp
   total_amount int 
-  status text
+  status enum('pending','confirmed','shipped','delivered','cancelled')
 
   created_at timestamp
   updated_at timestamp
 }
+
 order_items[icon: list]{
   id serial pk
   order_id int fk
@@ -77,8 +79,9 @@ payment[icon: money]{
   order_id int fk
 
   amount int not null
-  status text not null
-  method_of_payment text
+  status enum('pending','paid','failed')
+  method_of_payment enum('upi','card','cod')
+
 }
 
 shipping[icon: truck]{
@@ -89,6 +92,8 @@ shipping[icon: truck]{
   city text not null
   state text not null
   pincode int not null
+
+  status enum('pending','shipped','delivered')
 }
 
 //A customer can place multiple orders
@@ -98,8 +103,7 @@ customer.id < orders.customer_id
 orders.id < order_items.order_id
 
 //1 product can be part of multiple order_items
-product.id< order_items.product_id
-
+product.id < order_items.product_id
 
 product.id - thrift_products.product_id
 product.id - handmade_products.product_id
@@ -111,6 +115,4 @@ orders.id - payment.order_id
 orders.id - shipping.order_id
 
 // 1 product - 1 stock
-available_stocks.product_id  - product.id
-
-
+inventory.product_id - product.id
