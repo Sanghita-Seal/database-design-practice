@@ -1,0 +1,140 @@
+title Clinic Appointment and Diagnostics Platform
+users[icon: user, color: blue]{
+  user_id serial int pk
+
+  full_name string not null
+  email string not null unique
+  password_hash string not null
+  phone string 
+  role enum('admin', 'patient', 'doctor')
+
+  gender enum('male', 'female', 'others')
+  is_active boolean
+  last_login_at datetime
+
+  created_at datetime
+}
+
+specialties[icon: activity, color: orange]{
+  speciality_id int pk
+  name string not null
+  description text
+}
+
+doctors[icon: stethoscope, color: red]{
+  doctor_id serial int pk
+  user_id int fk
+  speciality_id int fk
+
+  experience_years int not null
+  qualification text
+  current_designation string
+}
+
+
+patients[icon: user-plus, color: yellow]{
+  patient_id int pk not null
+  user_id int fk
+
+  allergies string
+  medical_history text
+  blood_group enum("A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-") not null
+  Address string
+  state string
+}
+
+
+appointments[icon: calendar, color: blue]{
+  appointment_id int pk
+  doctor_id int fk
+  patient_id int fk
+
+  scheduled_at datetime
+  status enum("scheduled", "completed", "cancelled")
+  reason string
+
+  created_at datetime
+  updated_at datetime
+}
+
+
+consultations[icon: file-text, color: orange]{
+  consultation_id int pk
+  doctor_id int fk
+  patient_id int fk
+  appointment_id int fk
+
+  visit_time datetime
+  diagnosis string
+  prescription text
+  notes text
+
+  created_at datetime
+}
+
+
+
+tests_list[icon: test-tube, color: yellow]{
+  test_id  serial int pk
+  name string not null
+  description string not null
+  price decimal
+}
+
+prescribed_tests[icon: clipboard, color: red]{
+  prescribed_test_id int pk
+  consultation_id int fk 
+  test_id int fk
+
+  instruction text
+  status enum("prescribed tests", "completed", "cancelled")
+
+  created_at datetime 
+  updated_at datetime
+}
+
+
+
+payments[icon: credit-card, color: green]{
+  payment_id int pk
+  appointment_id int fk
+  prescribed_test_id int fk
+
+  amount decimal
+  transaction_number unique string
+  payment_method enum("UPI", "Card", "Cash")
+  status enum("success", "pending", "failed")
+
+  paid_at datetime
+}
+
+
+
+reports[icon: file, color: gray]{
+  report_id int pk
+  prescribed_test_id int fk
+
+  result_summary string not null
+  report_file_url string not null
+
+  generated_at datetime
+}
+users.user_id - doctors.user_id
+users.user_id - patients.user_id
+
+specialties.speciality_id < doctors.speciality_id
+
+doctors.doctor_id < appointments.doctor_id
+patients.patient_id < appointments.patient_id
+
+doctors.doctor_id < consultations.doctor_id
+patients.patient_id < consultations.patient_id
+appointments.appointment_id - consultations.appointment_id
+
+consultations.consultation_id < prescribed_tests.consultation_id
+tests_list.test_id < prescribed_tests.test_id
+
+appointments.appointment_id < payments.appointment_id
+prescribed_tests.prescribed_test_id < payments.prescribed_test_id
+
+prescribed_tests.prescribed_test_id < reports.prescribed_test_id
