@@ -4,12 +4,12 @@ users[icon: user, color: blue]{
   name string not null
   email unique string not null
   phone string not null
-  password_hashed string
+  password_hashed string not null
   role enum('trainer', 'client', 'admin')
 
   instagram_handle string
   gender string
-  dob date
+  dob date not null
 
   created_at datetime
   is_active boolean
@@ -18,9 +18,9 @@ users[icon: user, color: blue]{
 clients[icon: activity, color: purple]{
   client_id serial int pk
   user_id int fk
-  height decimal
+  height decimal 
   weight decimal
-  medical_conditions text
+  medical_conditions text not null
   fitness_goal string
   lifestyle_notes text
   state string
@@ -31,7 +31,7 @@ trainers[icon: award, color: orange]{
   trainer_id int pk
   user_id int fk
   bio text
-  experience_years int
+  experience_years int not null
   specialization string
   certification string
   pricing_note text
@@ -44,8 +44,8 @@ plans[icon: clipboard, color: yellow]{
   title string
   description text
   plan_type string
-  duration_days int 
-  price decimal
+  duration_days int not null
+  price decimal not null
 
   is_active boolean
   created_at datetime
@@ -73,8 +73,8 @@ subscriptions [icon: repeat, color: teal]{
   plan_id int fk
   trainer_id int fk
 
-  start_date datetime
-  end_date datetime
+  start_date datetime not null
+  end_date datetime not null
   status enum('active', 'expired', 'cancelled')
   auto_renew boolean
 
@@ -89,10 +89,10 @@ sessions[icon: video, color: cyan]{
   subscription_id int fk
 
   session_type enum('consultation', 'longterm coaching', 'live workout', 'diet & workout plan')
-  scheduled_at datetime
+  scheduled_at datetime not null
   duration_minutes int
   instagram_handle string
-  meeting_link string
+  meeting_link string not null
   session_status enum(scheduled, completed, missed)
   notes text
 
@@ -104,8 +104,8 @@ payments[icon: credit-card, color: green]{
   payment_id int pk
   subscription_id int fk
 
-  amount decimal
-  currency string
+  amount decimal not null
+  currency string not null
   payment_method enum(upi, card)
   session_status enum('scheduled', 'completed', 'missed')
   transaction_id string not null
