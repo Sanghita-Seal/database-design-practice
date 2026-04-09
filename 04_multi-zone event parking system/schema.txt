@@ -1,0 +1,133 @@
+title multi-zone event parking system DB design
+//add created at
+access_categories[icon:user, color: Red]{
+  access_category_id serial int pk
+
+  category enum("cosplayer", "exhibitors", "creators", "VIP guests", "staff members", "common visitors")
+
+  created_at datetime
+}
+vehicle_categories[icon: tree, color: Blue]{
+    vehicle_category_id int serial pk
+
+    category enum("bike", "cars", "SUVs", "cabs", "EVs")
+
+    created_at datetime
+    updated_at datetime
+    
+}
+vehicles[icon: car, color: Orange]{
+    vehilcle_id int serial pk
+    vehicle_category_id int fk
+
+    owner_name string not null
+    vehicle_reg_number string  unique not null
+    color string 
+    state string
+    country string
+
+    created_at datetime
+}
+
+parking_spot_zones[icon: box, color: Yellow]{
+  zone_id serial int pk
+
+  zone_name string // A,B,c
+  level int  
+
+  created_at datetime
+}
+parking_spot_categories[icon: box, color: Green]{
+   spot_category_id serial pk
+  
+  category enum(
+    "general","VIP","staff","exhibitor","cosplayer","EV_charging" )
+
+  created_at timestamp
+}
+parking_spot[icon: box, color: Orange]{
+   spot_id serial pk
+
+   zone_id int fk
+   spot_category_id int fk
+
+   spot_number string unique
+
+   is_occupied boolean
+
+   created_at datetime
+   updated_at datetime
+
+}
+parking_sessions[icon: timer, color: Blue]{
+  session_id serial pk
+
+  vehilcle_id int fk
+  spot_id int fk
+  access_category_id int fk
+
+  entry_time datetime
+  exit_time datetime
+
+  created_at datetime
+  updated_at datetime
+}
+
+parking_tickets[icon: ticket, color: Green]{
+  ticket_id serial pk
+  session_id int fk
+
+  ticket_number string unique
+
+  issued_at datetime
+  created_at datetime
+}
+
+parking_charges[icon: money, color: Orange]{
+  charge_id serial pk
+
+  vehicle_category_id int fk
+  spot_category_id int fk
+
+  rate_per_hour decimal
+
+  created_at datetime
+  updated_at datetime
+}
+
+
+
+payment[icon: money, color: Red]{
+    payment_id serial pk
+    session_id int fk
+
+    reference_number string unique
+    amount decimal
+
+    payment_status enum("pending", "completed", "failed")
+    payment_method enum("UPI", "card")
+
+    paid_at datetime
+    created_at datetime
+}
+ 
+ vehicles.vehicle_category_id - vehicle_categories.vehicle_category_id: [color: orange]
+
+parking_spot_zones.zone_id < parking_spot.zone_id: [color: yellow]
+parking_spot_categories.spot_category_id <parking_spot.spot_category_id: [color: green]
+
+
+
+vehicles.vehilcle_id < parking_sessions.vehilcle_id: [color: orange]
+parking_spot.spot_id <parking_sessions.spot_id: [color: orange]
+access_categories.access_category_id < parking_sessions.access_category_id: [color: red]
+
+parking_sessions.session_id - parking_tickets.session_id: [color: blue]
+
+vehicle_categories.vehicle_category_id <parking_charges.vehicle_category_id: [color: blue]
+parking_spot_categories.spot_category_id< parking_charges.spot_category_id: [color: green]
+
+
+parking_sessions.session_id <payment.session_id: [color: blue]
+
+
