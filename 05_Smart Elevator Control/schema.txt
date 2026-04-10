@@ -1,0 +1,127 @@
+title Smart Elevator Control DB design
+buildings[icon: building, color: Yellow]{
+  building_id serial pk
+
+  building_name string
+  address string
+  city string
+  state string
+
+  created_at timestamp
+}
+
+floors[icon: layers, color: Yellow]{
+  floor_id serial pk
+  buiding_id int fk
+
+  floor_number int not null
+
+  created_at timestamp
+}
+
+elevator_shafts[icon: columns]{
+    elevator_shaft_id serial pk
+    building_id int fk
+
+    shaft_number int not null unique
+
+    created_at timestamp
+}
+
+elevators[icon: move-vertical, color: Purple]{
+  elevator_id serial pk
+  buiding_id int fk
+  elevator_shaft_id int fk
+
+  elevator_number varchar
+  capacity int
+
+  created_at timestamp
+}
+
+elevator_floor_mapping[icon: map, color: Blue]{
+  map_id serial pk
+  elevator_id int fk
+  floor_id int fk
+
+  created_at timestamp
+}
+
+floor_requests[icon: bell, color: Orange]{
+  request_id serial pk
+  source_floor_id int fk
+  destination_floor_id int fk
+  buiding_id int fk
+
+  request_time timestamp
+
+  status enum("pending", "assigned", "completed", "cancelled")
+
+  created_at timestamp
+}
+
+ride_assignments[icon: git-branch, color: Green]{
+  assignment_id serial PK
+  
+  request_id int FK
+  elevator_id int FK
+  
+  assigned_at timestamp
+
+  created_at timestamp
+}
+
+ride_logs[icon: log]{
+  log_id serial pk
+  assignment_id int fk
+  elevator_id int fk
+
+  start_time datetime
+  end_time datetime
+
+  created_at timestamp
+}
+
+elevator_status[icon: activity, color: Orange]{
+  status_id serial pk
+  elevator_id int fk
+  current_floor_id int fk
+
+  status enum("idle", "working", "maintenance", "out-of-service")
+
+  created_at timestamp
+  updated_at timestamp
+}
+
+maintanence_tracker[icon: tool, color: Green]{
+  maintanence_id serial pk
+  elevator_id int fk
+
+  issue text
+  start_time timestamp
+  end_time timestamp
+  status enum("in-progress", "completed", "scheduled")
+
+  created_at timestamp 
+  updated_at timestamp
+}
+
+buildings.buiding_id < floors.buiding_id: [color: yellow]
+buildings.building_id < floor_requests.building_id: [color: yellow]
+buildings.building_id < elevator_shafts.building_id: [color: yellow]
+buildings.buiding_id < elevators.buiding_id: [color: yellow]
+
+elevator_shafts.elevator_shaft_id -elevators.elevator_shaft_id
+
+floors.floor_id > elevator_floor_mapping.floor_id: [color: yellow]
+elevators.elevator_id > elevator_floor_mapping.elevator_id: [color: blue]
+
+elevators.elevator_id < elevator_status.elevator_id: [color: purple]
+elevators.elevator_id < ride_assignments.elevator_id: [color: purple]
+floor_requests.request_id - ride_assignments.request_id: [color: orange]
+ride_assignments.assignment_id - ride_logs.assignment_id: [color: green]
+
+maintanence_tracker.elevator_id > elevators.elevator_id: [color: green]
+
+floor_requests.source_floor_id - floors.floor_id: [color: orange]
+floor_requests.destination_floor_id - floors.floor_id: [color: orange]
